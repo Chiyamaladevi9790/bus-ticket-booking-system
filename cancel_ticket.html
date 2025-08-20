@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cancel Ticket & Refund</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            max-width: 500px;
+            margin: auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 30px;
+        }
+        .form-control {
+            margin-bottom: 15px;
+        }
+        .message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cancel Ticket & Check Refund</h2>
+    <input type="text" id="seatNumber" class="form-control" placeholder="Enter Seat Number (e.g., 5)">
+    <input type="text" id="userId" class="form-control" placeholder="Enter Your User ID (e.g., 1)">
+    <button class="btn btn-danger w-100" onclick="cancelTicket()">Cancel Ticket</button>
+
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+    function cancelTicket() {
+        const seat = $('#seatNumber').val().trim();
+        const userId = $('#userId').val().trim();
+
+        if (!seat || !userId) {
+            $('#message').text('⚠️ Please enter both Seat Number and User ID.');
+            return;
+        }
+
+        $.post('cancel_ticket.php', { seat: seat, user_id: userId }, function(response) {
+            $('#message').text(response);
+        });
+    }
+</script>
+
+</body>
+</html>

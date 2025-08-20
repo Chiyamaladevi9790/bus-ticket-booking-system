@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUS TICKET BOOKING SYSTEM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            padding: 10px;
+        }
+
+        .container-fluid {
+            margin-top: 10px;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        footer a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand">Bus Ticket Booking System</a>
+            <form class="d-flex" onsubmit="redirectToDashboard(event)">
+                <input class="form-control me-2" type="text" id="username" placeholder="Username" required>
+                <input class="form-control me-2" type="password" id="password" placeholder="Password" required>
+                <button class="btn btn-primary" type="submit">Login</button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Section -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Image Section -->
+            <div class="col-md-8 p-0">
+                <img src="bus.jpg" class="img-fluid" alt="Bus">
+            </div>
+
+            <!-- Registration Form -->
+            <div class="col-md-4 bg-light p-4">
+                <h3>Create an Account</h3>
+                <form action="register.php" method="POST">
+    <div class="mb-2">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-control" name="username" placeholder="Username" required>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-control" name="full_name" placeholder="Full Name" required>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" placeholder="Email" required>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" placeholder="Password" required>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Gender</label><br>
+        <input type="radio" name="gender" value="male" required> Male
+        <input type="radio" name="gender" value="female" required> Female
+    </div>
+    <div class="mb-2">
+        <label class="form-label">User Type</label><br>
+        <input type="radio" name="user_type" value="passenger" required> Passenger
+            </div>
+    <div class="mb-2">
+        <label class="form-label">Address</label>
+        <input type="text" class="form-control" name="address" placeholder="Address" required>
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Mobile</label>
+        <div class="input-group">
+            <span class="input-group-text">+91</span>
+            <input type="text" class="form-control" name="mobile" placeholder="Mobile No." required>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+</form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center p-3 mt-3">
+        <p>BTBS, owned and operated by CRAD Technologies under the leadership of Chiyamala Devi, is a premium online and on-demand service provider committed to making your life more convenient, efficient, and smarter.</p>
+        <p>© 2025-2026 BTBS · All Rights Reserved</p>
+        <div>
+            <a href="#" class="text-white me-3">About Us</a>
+            <a href="#" class="text-white me-3">Contact Us</a>
+            <a href="#" class="text-white me-3">Terms of Use</a>
+            <a href="#" class="text-white">Privacy Policy</a>
+        </div>
+        <div class="mt-2">
+            <a href="#" class="text-white me-2">Facebook</a>
+            <a href="#" class="text-white me-2">Instagram</a>
+            <a href="#" class="text-white me-2">LinkedIn</a>
+            <a href="#" class="text-white">Twitter</a>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Redirect -->
+   <script>
+    function redirectToDashboard(event) {
+        event.preventDefault(); // Prevent form submission
+
+        let username = document.getElementById('username').value;
+
+        if (username.trim() !== '') {
+            // Correct relative path (Assuming dashboard.html is in the same folder)
+            window.location.href = "dashboard.html?user=" + encodeURIComponent(username);
+        } else {
+            alert('Please enter a username.');
+        }
+    }
+</script>

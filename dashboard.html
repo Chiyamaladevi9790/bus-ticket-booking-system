@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Selection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .navbar {
+            padding: 15px;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Notification styles */
+        .notification-bell {
+            position: relative;
+            color: white;
+            cursor: pointer;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        .notification-bell .count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+        #notification-box {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 10px;
+            z-index: 1000;
+            border-radius: 8px;
+        }
+        .notification-item {
+            font-size: 14px;
+            padding: 8px 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Splash screen styles */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out;
+        }
+        #splash-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        #splash-image {
+            max-width: 80%;
+            max-height: 80%;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Splash Screen -->
+<div id="splash-screen">
+    <img src="red.jpeg" alt="Splash Image" id="splash-image">
+</div>
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand">Bus Ticket Booking System</a>
+
+        <!-- 🔔 Bell Icon Added -->
+        <div class="d-flex align-items-center">
+            <div class="notification-bell" onclick="toggleNotifications()">
+                🔔 <span class="count" id="notif-count">0</span>
+            </div>
+            <a href="register.html" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Notification Popup Box -->
+<div id="notification-box"></div>
+
+<div class="container">
+    <h2 class="text-center">Select Your Bus Ticket</h2>
+    <form action="dashboard.php" method="POST">
+
+        <div class="mb-3">
+            <label class="form-label">Departure</label>
+            <select class="form-control" id="departure" name="departure" required>
+                <option value="">Select Departure</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Coimbatore">Coimbatore</option>
+                <option value="Madurai">Madurai</option>
+                <option value="Tiruchirappalli">Tiruchirappalli</option>
+                <option value="Salem">Salem</option>
+                <option value="Erode">Erode</option>
+                <option value="Tirunelveli">Tirunelveli</option>
+                <option value="Vellore">Vellore</option>
+                <option value="Thoothukudi">Thoothukudi</option>
+                <option value="Dindigul">Dindigul</option>
+                <option value="Thanjavur">Thanjavur</option>
+                <option value="Ranipet">Ranipet</option>
+                <option value="Sivaganga">Sivaganga</option>
+                <option value="Virudhunagar">Virudhunagar</option>
+                <option value="Tiruppur">Tiruppur</option>
+                <option value="Nagapattinam">Nagapattinam</option>
+                <option value="Karur">Karur</option>
+                <option value="Pudukkottai">Pudukkottai</option>
+                <option value="Ramanathapuram">Ramanathapuram</option>
+                <option value="Cuddalore">Cuddalore</option>
+                <option value="Kanchipuram">Kanchipuram</option>
+                <option value="Perambalur">Perambalur</option>
+                <option value="Namakkal">Namakkal</option>
+                <option value="Mayiladuthurai">Mayiladuthurai</option>
+                <option value="Krishnagiri">Krishnagiri</option>
+                <option value="Ariyalur">Ariyalur</option>
+                <option value="Tenkasi">Tenkasi</option>
+                <option value="Tiruvannamalai">Tiruvannamalai</option>
+                <option value="Nilgiris">Nilgiris</option>
+                <option value="Viluppuram">Viluppuram</option>
+                <option value="Kallakurichi">Kallakurichi</option>
+                <option value="Dharmapuri">Dharmapuri</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Destination</label>
+            <select class="form-control" id="destination" name="destination" required>
+                <option value="">Select Destination</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Coimbatore">Coimbatore</option>
+                <option value="Madurai">Madurai</option>
+                <option value="Tiruchirappalli">Tiruchirappalli</option>
+                <option value="Salem">Salem</option>
+                <option value="Erode">Erode</option>
+                <option value="Tirunelveli">Tirunelveli</option>
+                <option value="Vellore">Vellore</option>
+                <option value="Thoothukudi">Thoothukudi</option>
+                <option value="Dindigul">Dindigul</option>
+                <option value="Thanjavur">Thanjavur</option>
+                <option value="Ranipet">Ranipet</option>
+                <option value="Sivaganga">Sivaganga</option>
+                <option value="Virudhunagar">Virudhunagar</option>
+                <option value="Tiruppur">Tiruppur</option>
+                <option value="Nagapattinam">Nagapattinam</option>
+                <option value="Karur">Karur</option>
+                <option value="Pudukkottai">Pudukkottai</option>
+                <option value="Ramanathapuram">Ramanathapuram</option>
+                <option value="Cuddalore">Cuddalore</option>
+                <option value="Kanchipuram">Kanchipuram</option>
+                <option value="Perambalur">Perambalur</option>
+                <option value="Namakkal">Namakkal</option>
+                <option value="Mayiladuthurai">Mayiladuthurai</option>
+                <option value="Krishnagiri">Krishnagiri</option>
+                <option value="Ariyalur">Ariyalur</option>
+                <option value="Tenkasi">Tenkasi</option>
+                <option value="Tiruvannamalai">Tiruvannamalai</option>
+                <option value="Nilgiris">Nilgiris</option>
+                <option value="Viluppuram">Viluppuram</option>
+                <option value="Kallakurichi">Kallakurichi</option>
+                <option value="Dharmapuri">Dharmapuri</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Date of Journey</label>
+            <input type="date" class="form-control" id="journeyDate" name="journeyDate" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Search Buses</button>
+
+    </form>
+</div>
+
+<script>
+    function searchBuses() {
+        let departure = document.getElementById('departure').value;
+        let destination = document.getElementById('destination').value;
+        let journeyDate = document.getElementById('journeyDate').value;
+
+        if (departure && destination && journeyDate) {
+            window.location.href = `file:///C:/Users/Chiya/Desktop/indexx/map.html?departure=${encodeURIComponent(departure)}&destination=${encodeURIComponent(destination)}&date=${encodeURIComponent(journeyDate)}`;
+        } else {
+            alert('Please fill in all fields');
+        }
+    }
+
+    function toggleNotifications() {
+        const box = document.getElementById('notification-box');
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function fetchNotifications() {
+        fetch('fetch_notifications.php')
+            .then(response => response.json())
+            .then(data => {
+                const box = document.getElementById('notification-box');
+                const count = document.getElementById('notif-count');
+                box.innerHTML = '';
+
+                if (data.length === 0) {
+                    box.innerHTML = '<p class="text-muted text-center">No notifications</p>';
+                } else {
+                    data.forEach(notif => {
+                        box.innerHTML += `
+                            <div class="notification-item">
+                                <strong>${notif.pickup_location}</strong><br>
+                                ETA: ${notif.estimated_arrival}<br>
+                                Status: <span class="badge bg-info">${notif.status}</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                count.innerText = data.length;
+            })
+            .catch(err => console.error('Error loading notifications:', err));
+    }
+
+    fetchNotifications();
+    setInterval(fetchNotifications, 30000);
+
+    // Splash screen hide after 2 seconds
+    window.addEventListener('load', function () {
+        setTimeout(() => {
+            document.getElementById('splash-screen').classList.add('fade-out');
+        }, 2000);
+    });
+</script>
+
+</body>
+</html>

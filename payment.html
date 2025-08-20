@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Payment Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      background: #f4f4f4;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .card {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .details strong {
+      display: inline-block;
+      width: 150px;
+    }
+    .amount {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: green;
+    }
+    #paymentOptions, #qrSection, #successMessage {
+      display: none;
+    }
+    #qrImage {
+      max-width: 200px;
+      margin: 15px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <form action="payment.php" method="POST" id="paymentForm">
+    <div class="card">
+      <h2>Confirm Your Payment</h2>
+      <div class="details">
+        <p><strong>Bus Name:</strong> <span id="busName"></span></p>
+        <p><strong>From:</strong> <span id="departure"></span></p>
+        <p><strong>To:</strong> <span id="destination"></span></p>
+        <p><strong>Departure Time:</strong> <span id="time"></span></p>
+        <p><strong>Arrival Time:</strong> <span id="reachTime"></span></p>
+        <p><strong>Date:</strong> <span id="date"></span></p>
+        <p><strong>Selected Seats:</strong> <span id="seats"></span></p>
+        <p><strong>Price Per Seat:</strong> ₹<span id="price"></span></p>
+        <p><strong>Total Amount:</strong> ₹<span id="totalAmount" class="amount"></span></p>
+      </div>
+
+      <!-- Hidden inputs -->
+      <input type="hidden" name="bus_name" id="inputBusName" />
+      <input type="hidden" name="departure" id="inputDeparture" />
+      <input type="hidden" name="destination" id="inputDestination" />
+      <input type="hidden" name="departure_time" id="inputTime" />
+      <input type="hidden" name="arrival_time" id="inputReachTime" />
+      <input type="hidden" name="travel_date" id="inputDate" />
+      <input type="hidden" name="selected_seats" id="inputSeats" />
+      <input type="hidden" name="price_per_seat" id="inputPrice" />
+      <input type="hidden" name="total_amount" id="inputTotalAmount" />
+      <input type="hidden" name="payment_method" id="inputPaymentMethod" />
+
+      <button class="btn btn-success" type="button" onclick="showPaymentOptions()">Proceed to Pay</button>
+
+      <div id="paymentOptions" class="mt-4">
+        <h4>Select Payment Method</h4>
+        <button class="btn btn-outline-primary me-2" type="button" onclick="showQR()">Pay via QR</button>
+        <button class="btn btn-outline-secondary" type="button" onclick="showUPIInput()">Pay via UPI</button>
+      </div>
+
+      <div id="upiSection" class="mt-4" style="display: none;">
+        <h4>Enter Your UPI ID</h4>
+        <input type="text" name="upi_id" id="upiId" class="form-control" placeholder="Enter UPI ID" required />
+        <input type="hidden" value="UPI" name="payment_method" />
+        <button class="btn btn-primary mt-2" type="submit">Submit UPI ID</button>
+      </div>
+
+      <div id="qrSection" class="text-center mt-4">
+        <h5>Scan QR to Pay</h5>
+        <img id="qrImage" src="/indexx/upi.jpg" alt="QR Code" />
+        <input type="hidden" value="QR" name="payment_method" />
+        <button class="btn btn-primary mt-2" type="submit">I Have Paid</button>
+      </div>
+
+      <div id="successMessage" class="mt-4 text-center" style="display: block;">
+        <h4 class="text-success">✅ Seats booked successfully!</h4>
+        <p>🎉 Happy journey with us!</p>
+        <button class="btn btn-primary" type="button" onclick="downloadTicket()">Download Ticket</button>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const busName = params.get("busName");
+    const departure = params.get("departure");
+    const destination = params.get("destination");
+    const time = params.get("time");
+    const reachTime = params.get("reachTime");
+    const date = params.get("date");
+    const price = parseFloat(params.get("price")) || 0;
+    const seats = params.get("seats") || "";
+    const seatList = seats.split(',').filter(s => s.trim() !== "");
+    const total = seatList.length * price;
+
+    document.getElementById("busName").innerText = busName;
+    document.getElementById("departure").innerText = departure;
+    document.getElementById("destination").innerText = destination;
+    document.getElementById("time").innerText = time;
+    document.getElementById("reachTime").innerText = reachTime;
+    document.getElementById("date").innerText = date;
+    document.getElementById("seats").innerText = seatList.join(', ');
+    document.getElementById("price").innerText = price.toFixed(2);
+    document.getElementById("totalAmount").innerText = total.toFixed(2);
+
+    // Populate hidden inputs
+    document.getElementById("inputBusName").value = busName;
+    document.getElementById("inputDeparture").value = departure;
+    document.getElementById("inputDestination").value = destination;
+    document.getElementById("inputTime").value = time;
+    document.getElementById("inputReachTime").value = reachTime;
+    document.getElementById("inputDate").value = date;
+    document.getElementById("inputSeats").value = seatList.join(', ');
+    document.getElementById("inputPrice").value = price;
+    document.getElementById("inputTotalAmount").value = total;
+
+    function showPaymentOptions() {
+      document.getElementById("paymentOptions").style.display = "block";
+    }
+
+    function showQR() {
+      document.getElementById("qrSection").style.display = "block";
+      document.getElementById("inputPaymentMethod").value = "QR";
+    }
+
+    function showUPIInput() {
+      document.getElementById("upiSection").style.display = "block";
+      document.getElementById("paymentOptions").style.display = "none";
+      document.getElementById("inputPaymentMethod").value = "UPI";
+    }
+
+    async function downloadTicket() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Bus Ticket - Confirmation", 20, 20);
+      doc.setFontSize(12);
+      let y = 30;
+      doc.text(`Bus: ${busName}`, 20, y); y += 10;
+      doc.text(`From: ${departure}`, 20, y); y += 10;
+      doc.text(`To: ${destination}`, 20, y); y += 10;
+      doc.text(`Departure: ${time}`, 20, y); y += 10;
+      doc.text(`Arrival: ${reachTime}`, 20, y); y += 10;
+      doc.text(`Date: ${date}`, 20, y); y += 10;
+      doc.text(`Seats: ${seatList.join(', ')}`, 20, y); y += 10;
+      doc.text(`Price Per Seat: ₹${price.toFixed(2)}`, 20, y); y += 10;
+      doc.text(`Total Amount: ₹${total.toFixed(2)}`, 20, y); y += 20;
+      doc.text("🎉 Thank you for booking with us!", 20, y);
+
+      const fileName = `ticket_${busName}_${date}.pdf`;
+      doc.save(fileName);
+    }
+  </script>
+</body>
+</html>

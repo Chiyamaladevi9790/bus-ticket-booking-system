@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seat Selection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
+        .container { margin-top: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .bus-layout { display: flex; flex-direction: column; align-items: center; }
+        .row { display: flex; justify-content: center; margin-bottom: 5px; }
+        .seat { width: 40px; height: 40px; margin: 5px; background: lightgray; text-align: center; line-height: 40px; cursor: pointer; border-radius: 5px; }
+        .selected { background: green !important; color: white; }
+        .booked { background: red !important; color: white; cursor: not-allowed !important; pointer-events: none; }
+        .gap { width: 30px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Choose Your Seat</h2>
+        <div class="bus-layout" id="seatContainer"></div>
+        <br>
+        <button class="btn btn-primary" onclick="confirmSeats()">Confirm Seats</button>
+<br>
+<a href="cancel_ticket.html" class="btn btn-danger">Cancel Booked Seat</a>
+
+    </div>
+
+    <script>
+        function generateSeats() {
+            let container = document.getElementById('seatContainer');
+            let seatNumber = 1;
+            
+            for (let row = 0; row < 10; row++) {
+                let seatRow = document.createElement('div');
+                seatRow.classList.add('row');
+
+                for (let i = 0; i < 2; i++) {
+                    let seat = createSeat(seatNumber++);
+                    seatRow.appendChild(seat);
+                }
+
+                let gap = document.createElement('div');
+                gap.classList.add('gap');
+                seatRow.appendChild(gap);
+
+                for (let i = 0; i < 3; i++) {
+                    let seat = createSeat(seatNumber++);
+                    seatRow.appendChild(seat);
+                }
+
+                container.appendChild(seatRow);
+            }
+        }
+
+        function createSeat(number) {
+            let seat = document.createElement('div');
+            seat.classList.add('seat');
+            seat.innerText = number;
+            seat.onclick = function () {
+                seat.classList.toggle('selected');
+            };
+            return seat;
+        }
+
+        function loadBookedSeats() {
+            $.get('load_seats.php', function(data) {
+                const booked = JSON.parse(data);
+                booked.forEach(seatNum => {
+                    const seatDiv = [...document.querySelectorAll('.seat')]
+                        .find(s => s.innerText === seatNum.toString());
+                    if (seatDiv) {
+                        seatDiv.classList.add('booked');
+                    }
+                });
+            });
+        }
+
+        function confirmSeats() {
+            let selectedSeats = [];
+            document.querySelectorAll('.seat.selected').forEach(seat => selectedSeats.push(seat.innerText));
+
+            if (selectedSeats.length === 0) {
+                alert('Please select at least one seat.');
+                return;
+            }
+
+            const user_id = 1; // Replace with actual user session ID if needed
+
+            $.post('book_seats.php', {
+                seats: selectedSeats.join(','),
+                user_id: user_id
+            }, function(response) {
+                if (response === 'success') {
+                    alert('✅ Seats booked successfully!');
+
+                    // Collect data from URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const busName = urlParams.get("busName");
+                    const departure = urlParams.get("departure");
+                    const destination = urlParams.get("destination");
+                    const time = urlParams.get("time");
+                    const reachTime = urlParams.get("reachTime");
+                    const price = urlParams.get("price");
+                    const date = urlParams.get("date");
+
+                    // Redirect to payment.html with all details
+                    window.location.href = `payment.html?busName=${encodeURIComponent(busName)}&departure=${encodeURIComponent(departure)}&destination=${encodeURIComponent(destination)}&time=${encodeURIComponent(time)}&reachTime=${encodeURIComponent(reachTime)}&price=${encodeURIComponent(price)}&date=${encodeURIComponent(date)}&seats=${encodeURIComponent(selectedSeats.join(','))}`;
+                } else {
+                    alert('❌ Booking failed: ' + response);
+                }
+            });
+        }
+
+        generateSeats();
+        loadBookedSeats();
+    </script>
+
+</body>
+</html>

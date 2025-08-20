@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bus Notification Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+  <style>
+    body {
+      background-color: #f4f4f4;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 50px;
+      max-width: 600px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Bus Notification Form</h2>
+  <!-- Ensure the form action is pointing to userdetails.php -->
+  <form id="notificationForm" action="submit_userdetails.php" method="POST">
+    <div class="mb-3">
+      <label for="user_id" class="form-label">User ID</label>
+      <input type="number" class="form-control" id="user_id" name="user_id" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="ticket_id" class="form-label">Ticket ID</label>
+      <input type="number" class="form-control" id="ticket_id" name="ticket_id" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="bus_id" class="form-label">Bus ID</label>
+      <input type="number" class="form-control" id="bus_id" name="bus_id" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="pickup_location" class="form-label">Pickup Location</label>
+      <input type="text" class="form-control" id="pickup_location" name="pickup_location" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="estimated_arrival" class="form-label">Estimated Arrival</label>
+      <input type="datetime-local" class="form-control" id="estimated_arrival" name="estimated_arrival" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="distance_km" class="form-label">Distance (km)</label>
+      <input type="number" step="0.1" class="form-control" id="distance_km" name="distance_km" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="status" class="form-label">Status</label>
+      <select class="form-select" id="status" name="status" required>
+        <option value="">Select Status</option>
+        <option value="On Time">On Time</option>
+        <option value="Delayed">Delayed</option>
+        <option value="Cancelled">Cancelled</option>
+        <option value="Boarded">Boarded</option>
+        <option value="Arrived">Arrived</option>
+      </select>
+    </div>
+
+    <!-- Submit button -->
+    <button type="submit" class="btn btn-success w-100">Submit</button>
+  </form>
+</div>
+
+</body>
+</html>

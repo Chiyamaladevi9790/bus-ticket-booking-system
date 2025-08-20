@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Buses</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        .container { margin-top: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .bus-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; background-color: #fff; }
+        #map { height: 400px; width: 100%; margin-top: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body onload="loadBuses()">
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand">Bus Ticket Booking System</a>
+        <a href="index.html" class="btn btn-danger">Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h2 class="text-center">Available Buses</h2>
+    <p class="text-center">Showing results for <strong id="routeInfo"></strong></p>
+
+    <div id="busList"></div>
+
+    <h3 class="text-center mt-4">Bus Route Map</h3>
+    <div id="map"></div>
+</div>
+
+<script>
+    let map;
+
+    function loadBuses() {
+        // Get the URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const departure = params.get('departure') || "Unknown Departure";
+        const destination = params.get('destination') || "Unknown Destination";
+        const journeyDate = params.get('date') || "Unknown Date";
+
+        // Update the route information displayed
+        document.getElementById("routeInfo").innerText = `${departure} to ${destination} on ${journeyDate}`;
+
+        // Simulating the available buses data (you would typically fetch this data from a server)
+        const buses = [
+            { name: "Express Bus", time: "08:00 AM", travelTime: "6h", reachTime: "02:00 PM", stops: 5, price: 500 },
+            { name: "Luxury Coach", time: "10:00 AM", travelTime: "5h 30m", reachTime: "03:30 PM", stops: 3, price: 750 },
+            { name: "Sleeper Bus", time: "09:30 PM", travelTime: "7h", reachTime: "04:30 AM", stops: 6, price: 900 }
+        ];
+
+        let busListHTML = "";
+        buses.forEach(bus => {
+            busListHTML += `
+                <div class="bus-card">
+                    <h5>${bus.name}</h5>
+                    <p><strong>Departure Time:</strong> ${bus.time}</p>
+                    <p><strong>Travel Time:</strong> ${bus.travelTime}</p>
+                    <p><strong>Reach Time:</strong> ${bus.reachTime}</p>
+                    <p><strong>Number of Stops:</strong> ${bus.stops}</p>
+                    <p><strong>Price:</strong> ₹${bus.price}</p>
+                    <button class="btn btn-primary" onclick="bookNow('${bus.name}', '${departure}', '${destination}', '${bus.time}', '${bus.reachTime}', '${bus.price}', '${journeyDate}')">Book Now</button>
+                </div>
+            `;
+        });
+
+        document.getElementById("busList").innerHTML = busListHTML;
+
+        // Initialize the map with the correct departure and destination
+        loadMap(departure, destination);
+
+        // 📍 Show passenger's current location on the map
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    const marker = L.marker([lat, lng]).addTo(map)
+                        .bindPopup("📍 You are here")
+                        .openPopup();
+
+                    map.setView([lat, lng], 12);
+                },
+                function(error) {
+                    console.error("Error getting location:", error.message);
+                }
+            );
+        } else {
+            console.warn("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function bookNow(busName, departure, destination, time, reachTime, price, journeyDate) {
+        window.location.href = `seat_selection.html?busName=${encodeURIComponent(busName)}&departure=${encodeURIComponent(departure)}&destination=${encodeURIComponent(destination)}&time=${encodeURIComponent(time)}&reachTime=${encodeURIComponent(reachTime)}&price=${encodeURIComponent(price)}&date=${encodeURIComponent(journeyDate)}`;
+    }
+
+    function loadMap(departure, destination) {
+        // Initialize map view centered on a default location (can be adjusted later)
+        map = L.map('map').setView([11.1271, 78.6569], 7); // Default center (could be changed based on your requirements)
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Get coordinates for the departure and destination cities
+        const depCoords = getCoordinates(departure);
+        const destCoords = getCoordinates(destination);
+
+        // Add markers for both the departure and destination cities
+        L.marker(depCoords).addTo(map)
+            .bindPopup(`<b>Departure: ${departure}</b>`)
+            .openPopup();
+
+        L.marker(destCoords).addTo(map)
+            .bindPopup(`<b>Destination: ${destination}</b>`);
+
+        // Fetch route data from OSRM (Open Source Routing Machine) API and plot the route on the map
+        fetch(`https://router.project-osrm.org/route/v1/driving/${depCoords[0]},${depCoords[1]};${destCoords[0]},${destCoords[1]}?overview=full&geometries=geojson`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.routes && data.routes.length > 0) {
+                    var route = L.geoJSON(data.routes[0].geometry);
+                    route.addTo(map);
+                    map.fitBounds(route.getBounds());
+                } else {
+                    console.error("No route found!");
+                }
+            })
+            .catch(error => console.error("Error loading route:", error));
+    }
+
+    function getCoordinates(city) {
+        const locations = {
+            "Chennai": [80.2707, 13.0827],
+            "Madurai": [78.1198, 9.9252],
+            "Coimbatore": [76.9558, 11.0168],
+            "Tiruchirappalli": [78.7047, 10.7905]
+        };
+        return locations[city] || [80.2707, 13.0827]; // Default to Chennai if city is not found
+    }
+
+    // Redirect logout button to register.html
+    document.querySelector('.btn.btn-danger[href="index.html"]').setAttribute('href', 'register.html');
+</script>
+
+</body>
+</html>
